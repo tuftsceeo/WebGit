@@ -1,0 +1,82 @@
+<html>
+	<head>
+		<title>Browser Git Integration Test</title>
+		<script lang="javascript">
+			////////////////////////////////////////////////
+			// write_output(data) 
+			// - write data to the output div
+			////////////////////////////////////////////////
+			function write_output(data) {
+				output = document.getElementById('output');
+				// search/replace new line from:
+				// https://www.codegrepper.com/code-examples/javascript/how+to+replace+newline+in+a+string+in+js
+				data = data.replace(/(\r\n|\n|\r)/gm, "<br />\n");
+				output.innerHTML += data + "<br />\n";
+				// scroll to bottom of div
+				// from: https://stackoverflow.com/questions/270612/scroll-to-bottom-of-div
+				output.scrollTop = output.scrollHeight;
+
+			}
+			////////////////////////////////////////////////
+			// run_command(command) 
+			// - execute command on server, and display output
+			////////////////////////////////////////////////
+			function run_command(command) {
+				write_output('<b><font color="red">> Running Command:</font> ' + command + "</b>")
+				// (1) fetch the command from the server
+				// (2) resolve the result (data => data.text())
+				// (3) write the result (datatext) to the output
+				fetch('?command=' + command)
+					.then(data => data.text())
+					.then(function (datatext) { write_output(datatext); })
+					.catch(error => { console.error('FETCH ERROR:', error); } )
+				;
+			}
+		</script>
+		<style>
+			/* format the output div for displaying results */
+			.output {
+				background-color: #eee;
+				border: 1px solid #999;
+				display: block;
+				padding: 20px;
+				font-family: 'Courier New', monospace;
+				overflow: scroll;
+				height: 400px;
+			}
+			.textboxes {
+				font-family: 'Courier New', monospace;
+				width: 250px;
+			}
+		</style>
+	</head>
+	<body>
+		
+		<h1>Browser Git Integration Test</h1>
+		
+		<p>
+			<button onclick='run_command("pwd");'>pwd</button>
+		</p>
+
+		<p>
+			<button onclick='run_command("ls " + document.getElementById("ls_path").value);'>ls</button>
+			options/path: <input type='text' id='ls_path' class='textboxes'>
+		</p>
+
+		<p>
+			<button onclick='run_command("whois " + document.getElementById("whois_url").value);'>whois</button>
+			URL: <input type='text' id='whois_url' value='google.com' class='textboxes'>
+		</p>
+
+		<p>
+			<button onclick='run_command("git " + document.getElementById("git_command").value);'>git</button>
+			command: <input type='text' id='git_command' value='init -b main' class='textboxes'>
+		</p>
+		
+		<p>
+			<b>Output:</b><br />
+			<div id='output' class='output'></div>
+		</p>
+		
+	</body>
+</html>
